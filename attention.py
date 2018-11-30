@@ -28,29 +28,26 @@ class Attention(nn.Module):
         self.v = nn.Parameter(torch.rand(dec_hid_dim))
         
     def forward(self, hidden, encoder_outputs):
-        # hidden = [batch size, dec hid dim]
-        # encoder_outputs = [src sent len, batch size, enc hid dim * 2]
+        # hidden = [batch_size, dec hid dim]
+        # encoder_outputs = [batch_size, seq_len, enc_hid_dim * 2]
         
         batch_size = encoder_outputs.shape[1]
-        src_len = encoder_outputs.shape[0]
+        seq_len = encoder_outputs.shape[0]
         
-        hidden = hidden.unsqueeze(1).repeat(1, src_len, 1)
-        encoder_outputs = encoder_outputs.permute(1, 0, 2)
-        # hidden = [batch size, src sent len, dec hid dim]
-        # encoder_outputs = [batch size, src sent len, enc hid dim * 2]
+        hidden = hidden.unsqueeze(1).repeat(1, seq_len, 1)
+        # hidden = [batch_size, seq_len, dec_hid_dim]
         
         energy = torch.tanh(self.attn(torch.cat((hidden, encoder_outputs), dim=2)))
-        # energy = [batch size, src sent len, dec hid dim]
+        # energy = [batch size, seq_len, dec_hid_dim]
         
         energy = energy.permute(0, 2, 1)
-        # energy = [batch size, dec hid dim, src sent len]
+        # energy = [batch_size, dec_hid_dim, seq_len]
         
-        # context = [dec hid dim]
+        # v = [dec_hid_dim]
         v = self.v.repeat(batch_size, 1).unsqueeze(1)
-        # context = [batch size, 1, dec hid dim]
+        # v = [batch size, 1, dec_hid_dim]
         
         energy = torch.bmm(v, energy).squeeze(1)
-        # energy = [batch size, src len]
+        # energy = [batch_size, seq_len]
         
         return F.softmax(energy, dim=1)
-
