@@ -3,6 +3,7 @@
 
 # In[1]:
 
+import random
 
 import torch
 import torch.nn as nn
@@ -37,15 +38,14 @@ class Generator(nn.Module):
         #encoder_outputs is all hidden states of the input sequence, back and forwards
         #hidden is the final forward and backward hidden states, passed through a linear layer
         encoder_outputs, encoder_h_n, hidden = self.encoder(src)
-                
+
         #first input to the decoder is the <sos> tokens
         output = trg[:, 0] #[batch_size]
-        
         for t in range(1, max_len):
             output, hidden = self.decoder(output, hidden, encoder_outputs)
             outputs[:, t] = output #[batch_size, output_dim]
             teacher_force = random.random() < teacher_forcing_ratio
-            top1 = output.max(1) #[batch_size]
-            output = (trg[:,t] if teacher_force else top1)
+            top1 = output.max(1)[1] #[batch_size]
+            output = (trg[:,t]  if teacher_force else top1)
 
         return encoder_outputs, encoder_h_n, outputs

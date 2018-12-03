@@ -31,12 +31,12 @@ class Attention(nn.Module):
         # hidden = [batch_size, dec hid dim]
         # encoder_outputs = [batch_size, seq_len, enc_hid_dim * 2]
         
-        batch_size = encoder_outputs.shape[1]
-        seq_len = encoder_outputs.shape[0]
+        batch_size = encoder_outputs.shape[0]
+        seq_len = encoder_outputs.shape[1]
         
         hidden = hidden.unsqueeze(1).repeat(1, seq_len, 1)
         # hidden = [batch_size, seq_len, dec_hid_dim]
-        
+       
         energy = torch.tanh(self.attn(torch.cat((hidden, encoder_outputs), dim=2)))
         # energy = [batch size, seq_len, dec_hid_dim]
         

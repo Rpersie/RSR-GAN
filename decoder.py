@@ -32,7 +32,7 @@ class Decoder(nn.Module):
         # input = [batch_size]
         # hidden = [batch_size, dec_hid_dim]
         # encoder_outputs = [batch_size, seq_len, enc_hid_dim * 2]
-        
+
         input = input.unsqueeze(1)
         # input = [batch_size, 1]
         

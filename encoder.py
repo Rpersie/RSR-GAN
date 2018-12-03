@@ -16,14 +16,15 @@ import torch.nn.functional as F
 
 
 class Encoder(nn.Module):
-    def __init__(self, input_size, num_gru, enc_hid_dim,
-                 dec_hid_dim, dropout_rate, use_pooling=False):
+    def __init__(self, input_size, num_gru, enc_hid_dim, dec_hid_dim, 
+                 dropout_rate, device, use_pooling=False):
         super().__init__()
         self.input_size = input_size
         self.num_gru = num_gru
         self.enc_hid_dim = enc_hid_dim
         self.dec_hid_dim = dec_hid_dim
         self.dropout_rate = dropout_rate
+        self.device = device
         self.use_pooling = use_pooling
         
         self.rnn_stack = nn.ModuleList()
@@ -59,7 +60,7 @@ class Encoder(nn.Module):
         # output = [batch_size, seq_len, enc_hid_dim * num_directions]
         # h_n = [num_layers * num_directions, batch_size, enc_hid_dim]
         
-        batch_norm = nn.BatchNorm1d(num_features=output.size(2))
+        batch_norm = nn.BatchNorm1d(num_features=output.size(2)).to(self.device)
         # batch_norm input -> (N,C,L), where C is num_features. 
         
         output = batch_norm(output.permute(0, 2, 1)).permute(0, 2, 1)

@@ -53,24 +53,26 @@ class SpeechDataset(Dataset):
     def __getitem__(self, idx):
         wav_file = self.speech_frame.iloc[idx, 0]
         transcript_file = self.speech_frame.iloc[idx, 1]
-        
-        signal, _ = sf.read(wav_file)
-        signal /= 1 << 31
-        signal = self.spectrogram(signal)
-        
-        with open(transcript_file, 'r') as f:
-            transcript = f.read().strip()
-        transcript_idx = []
-        transcript_idx.append(self.labels['<sos>'])
-        for char in list(transcript):
-            if char in self.labels:
-                transcript_idx.append(self.labels[char])
-        transcript_idx.append(self.labels['<eos>'])
-        sample = {'signal': signal, 'transcript': np.array(transcript_idx)}
-        if self.transform:
-            sample = self.transform(sample)
+        try:
+            signal, _ = sf.read(wav_file)
+            signal /= 1 << 31
+            signal = self.spectrogram(signal)
 
-        return sample
+            with open(transcript_file, 'r') as f:
+                transcript = f.read().strip()
+            transcript_idx = []
+            transcript_idx.append(self.labels['<sos>'])
+            for char in list(transcript):
+                if char in self.labels:
+                    transcript_idx.append(self.labels[char])
+            transcript_idx.append(self.labels['<eos>'])
+            sample = {'signal': signal, 'transcript': np.array(transcript_idx)}
+            if self.transform:
+                sample = self.transform(sample)
+
+            return sample
+        except:
+            return wav_file
     
     def spectrogram(self, signal):
         n_fft = int(self.sampling_rate * self.window_size)
