@@ -24,7 +24,7 @@ class Attention(nn.Module):
         self.enc_hid_dim = enc_hid_dim
         self.dec_hid_dim = dec_hid_dim
         
-        self.attn = nn.Linear((enc_hid_dim * 2) + dec_hid_dim, dec_hid_dim)
+        self.attn = nn.Linear(enc_hid_dim + dec_hid_dim, dec_hid_dim)
         self.v = nn.Parameter(torch.rand(dec_hid_dim))
         
     def forward(self, hidden, encoder_outputs):

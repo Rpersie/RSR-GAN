@@ -24,8 +24,8 @@ class Decoder(nn.Module):
         self.attention = attention
         
         self.embedding = nn.Embedding(output_dim, emb_dim)
-        self.gru = nn.GRU((enc_hid_dim * 2) + emb_dim, dec_hid_dim, batch_first=True)
-        self.fc = nn.Linear((enc_hid_dim * 2) + dec_hid_dim + emb_dim, output_dim)
+        self.gru = nn.GRU(enc_hid_dim + emb_dim, dec_hid_dim, batch_first=True)
+        self.fc = nn.Linear(enc_hid_dim + dec_hid_dim + emb_dim, output_dim)
         self.dropout = nn.Dropout(dropout_rate)
         
     def forward(self, input, hidden, encoder_outputs):
